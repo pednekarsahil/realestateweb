@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your Dream Home</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Tailwind Configuration and Styles -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            DEFAULT: '#8A2BE2',
+                            light: '#E6D8F9',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'floating': '0 20px 40px -15px rgba(138, 43, 226, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar Hiding */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Screen transitions */
+        .screen { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .screen.active { display: flex; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================
+           3D GLASS BOTTOM NAV
+           ============================================ */
+        .glass-nav {
+            position: relative;
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.55) 0%,
+                rgba(255, 255, 255, 0.25) 50%,
+                rgba(230, 216, 249, 0.35) 100%
+            );
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow:
+                0 20px 40px -10px rgba(138, 43, 226, 0.25),
+                0 10px 20px -8px rgba(31, 38, 135, 0.15),
+                0 4px 6px -2px rgba(0, 0, 0, 0.08),
+                inset 0 2px 2px rgba(255, 255, 255, 0.95),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -3px 6px rgba(138, 43, 226, 0.12),
+                inset 0 -1px 1px rgba(255, 255, 255, 0.4);
+            overflow: hidden;
+        }
+
+        .glass-nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 55%;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.5) 0%,
+                rgba(255, 255, 255, 0.15) 55%,
+                transparent 100%
+            );
+            pointer-events: none;
+            border-radius: 9999px 9999px 0 0;
+        }
+
+        .glass-nav::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 60%;
+            height: 200%;
+            background: linear-gradient(
+                115deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 45%,
+                rgba(255, 255, 255, 0.55) 50%,
+                rgba(255, 255, 255, 0.3) 55%,
+                transparent 100%
+            );
+            transform: rotate(15deg);
+            pointer-events: none;
+        }
+
+        .glass-nav > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ============================================
+           3D BALLOON BUTTON — REUSABLE STYLE
+           ============================================ */
+        .balloon-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 9999px;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(145deg, #a855f7, #ec4899);
+            outline: none;
+            transition: transform 0.2s ease, background 0.2s ease;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            background-blend-mode: overlay;
+            isolation: isolate;
+        }
+
+        .balloon-btn::before {
+            content: '';
+            position: absolute;
+            top: 8%;
+            left: 8%;
+            width: 28%;
+            height: 22%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 80%);
+            filter: blur(1px);
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .balloon-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 6%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 12%;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+            filter: blur(3px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .balloon-btn:hover { transform: scale(1.02) translateY(-2px); }
+        .balloon-btn:active { transform: scale(0.98) translateY(1px); }
+
+        /* ============================================
+           SEARCH BAR
+           ============================================ */
+        .search-bar {
+            height: 44px;
+            padding: 0 1rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ============================================
+           INACTIVE PILL STYLE
+           ============================================ */
+        .pill-inactive {
+            background: #f3f4f6;
+            color: #4b5563;
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pill-inactive:hover {
+            background: #e5e7eb;
+            transform: translateY(-1px);
+        }
+
+        .pill-balloon {
+            height: 36px !important;
+            padding: 0 1.25rem !important;
+            font-size: 0.875rem !important;
+            font-weight: 700 !important;
+        }
+
+        .schedule-btn-balloon {
+            height: 52px !important;
+            padding: 0 2rem !important;
+            font-size: 1rem !important;
+            width: 100%;
+        }
+
+        /* ============================================
+           BOTTOM NAV
+           ============================================ */
+        .nav-item {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            height: 44px;
+            padding: 0 1.25rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #4b5563;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            transition: color 0.25s ease, background 0.25s ease;
+            white-space: nowrap;
+        }
+        .nav-item:hover { color: #8A2BE2; }
+        .nav-item .nav-label {
+            display: inline-block;
+            max-width: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-width 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+        }
+        .nav-item.active .nav-label { max-width: 100px; opacity: 1; }
+        .nav-item.active {
+            background: linear-gradient(145deg, #a855f7, #ec4899);
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 8%; left: 8%;
+            width: 28%; height: 22%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 80%);
+            filter: blur(1px);
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 6%; left: 50%;
+            transform: translateX(-50%);
+            width: 70%; height: 12%;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+            filter: blur(3px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .nav-item > i {
+            position: relative;
+            z-index: 3;
+            font-size: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+        }
+        .nav-item .nav-icon-fill { display: none; }
+        .nav-item.active .nav-icon-fill { display: inline-flex; }
+        .nav-item.active .nav-icon-line { display: none; }
+
+        /* ============================================
+           GLASS BADGE — for BOTH "For Rent" AND "For Sale"
+           ============================================ */
+        .badge-glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            color: #ffffff;
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.08),
+                inset 0 1px 1px rgba(255, 255, 255, 0.6);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+        }
+
+        /* ============================================
+           DETAIL TABS
+           ============================================ */
+        .detail-tab {
+            padding-bottom: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6b7280;
+            border-bottom: 2px solid transparent;
+            position: relative;
+            top: 1px;
+            transition: color 0.2s ease, border-color 0.2s ease;
+            background: transparent;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            cursor: pointer;
+        }
+        .detail-tab:hover { color: #1f2937; }
+        .detail-tab.active {
+            font-weight: 700;
+            color: #111827;
+            border-bottom-color: #8A2BE2;
+        }
+        .detail-panel { display: none; }
+        .detail-panel.active { display: block; }
+    </style>
+</head>
+<body class="bg-blue-50 flex items-center justify-center min-h-screen font-sans antialiased text-gray-800">
+
+    <!-- App Wrapper -->
+    <div class="relative w-full max-w-[400px] h-[100dvh] sm:h-[850px] bg-white sm:rounded-[2.5rem] sm:shadow-[0_0_0_12px_#111,0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col">
+
+        <!-- Status Bar Mockup -->
+        <div class="hidden sm:flex justify-between items-center px-6 pt-4 pb-2 text-xs font-semibold z-50 bg-white/80 backdrop-blur-sm absolute top-0 left-0 right-0">
+            <span>9:41</span>
+            <div class="w-32 h-6 bg-black rounded-full absolute left-1/2 -translate-x-1/2 top-2"></div>
+            <div class="flex gap-2 items-center">
+                <i class="ph-fill ph-cell-signal-full text-sm"></i>
+                <i class="ph-fill ph-wifi-high text-sm"></i>
+                <i class="ph-fill ph-battery-full text-lg"></i>
+            </div>
+        </div>
+
+        <!-- ==================== HOME SCREEN ==================== -->
+        <div id="home-screen" class="screen active flex-col h-full w-full relative sm:pt-12">
+            <div class="flex-1 overflow-y-auto hide-scrollbar pb-32">
+                <!-- Header -->
+                <header class="flex justify-between items-center px-6 pt-6 pb-4">
+                    <div class="flex items-center gap-3">
+                        <img src="logo my company.png" alt="User Avatar" class="w-10 h-10 rounded-full border-2 border-brand-100 object-cover">
+                        <span class="font-semibold text-lg">Sahil Pednekar</span>
+                    </div>
+                </header>
+
+                <!-- Search Section -->
+                <section class="px-6 py-2">
+                    <h1 class="text-2xl font-bold mb-1">Find Your Dream Home</h1>
+                    <p class="text-gray-500 text-sm mb-4">Discover properties tailored to your preferences</p>
+
+                    <div class="w-full">
+                        <div class="w-full bg-gray-100 search-bar">
+                            <i class="ph ph-magnifying-glass text-gray-400 text-lg"></i>
+                            <input
+                                id="home-search-input"
+                                type="text"
+                                placeholder="Search city (Ratnagiri, Chiplun...)"
+                                class="bg-transparent border-none outline-none text-sm ml-2 w-full text-gray-700 placeholder-gray-400"
+                                autocomplete="off"
+                            >
+                            <button id="home-search-clear" class="hidden text-gray-400 hover:text-gray-700">
+                                <i class="ph ph-x-circle text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Filter Pills -->
+                <section class="pl-6 py-4 flex gap-3 overflow-x-auto hide-scrollbar pr-6" id="filter-pills">
+                    <button class="balloon-btn pill-balloon" data-filter="All" onclick="activateFilter(this)">All</button>
+                    <button class="pill-inactive" data-filter="Buy" onclick="activateFilter(this)">Sale</button>
+                    <button class="pill-inactive" data-filter="Rent" onclick="activateFilter(this)">Rent</button>
+                    <button class="pill-inactive" data-filter="Bunglow" onclick="activateFilter(this)">Bunglow</button>
+                    <button class="pill-inactive" data-filter="Apartment" onclick="activateFilter(this)">Apartment</button>
+                </section>
+
+                <!-- Recommended List -->
+                <section class="px-6 py-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold" id="list-title">All Properties</h2>
+                        <button class="text-gray-400 hover:text-gray-800"><i class="ph ph-faders text-xl"></i></button>
+                    </div>
+
+                    <div id="property-list" class="space-y-5"></div>
+
+                    <div id="empty-state" class="hidden text-center py-12">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                            <i class="ph ph-magnifying-glass text-3xl text-gray-400"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-1">No Properties Found</h3>
+                        <p class="text-gray-400 text-sm" id="empty-message">Try searching for "Ratnagiri" or "Chiplun"</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Floating Bottom Nav -->
+            <nav class="absolute bottom-6 left-6 right-6 glass-nav rounded-full px-2 py-2 flex justify-between items-center z-40" id="bottom-nav">
+                <button class="nav-item active" data-tab="home" data-label="Home" onclick="activateTab(this)">
+                    <i class="ph-fill ph-house nav-icon-fill"></i>
+                    <i class="ph ph-house nav-icon-line"></i>
+                    <span class="nav-label">Home</span>
+                </button>
+                <button class="nav-item" data-tab="heart" data-label="Favourites" onclick="activateTab(this)">
+                    <i class="ph-fill ph-heart nav-icon-fill"></i>
+                    <i class="ph ph-heart nav-icon-line"></i>
+                    <span class="nav-label">Favourites</span>
+                </button>
+                <button class="nav-item" data-tab="map" data-label="Map" onclick="activateTab(this)">
+                    <i class="ph-fill ph-map-pin nav-icon-fill"></i>
+                    <i class="ph ph-map-pin nav-icon-line"></i>
+                    <span class="nav-label">Map</span>
+                </button>
+                <button class="nav-item" data-tab="chat" data-label="Chat" onclick="activateTab(this)">
+                    <i class="ph-fill ph-chat-circle nav-icon-fill"></i>
+                    <i class="ph ph-chat-circle nav-icon-line"></i>
+                    <span class="nav-label">Chat</span>
+                </button>
+                <button class="nav-item" data-tab="user" data-label="Profile" onclick="activateTab(this)">
+                    <i class="ph-fill ph-user nav-icon-fill"></i>
+                    <i class="ph ph-user nav-icon-line"></i>
+                    <span class="nav-label">Profile</span>
+                </button>
+            </nav>
+        </div>
+
+
+        <!-- ==================== PROPERTY DETAILS SCREEN ==================== -->
+        <div id="details-screen" class="screen flex-col h-full w-full bg-white relative sm:pt-12">
+            <header class="flex justify-between items-center px-6 pt-6 pb-4 bg-white z-10">
+                <button onclick="navigate('home-screen')" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-800 hover:bg-gray-100 transition">
+                    <i class="ph ph-arrow-left text-xl"></i>
+                </button>
+                <h1 class="text-lg font-bold">Property Details</h1>
+                <button class="w-10 h-10 rounded-full flex items-center justify-center text-gray-800 hover:bg-gray-100 transition">
+                    <i class="ph ph-bookmark-simple text-xl"></i>
+                </button>
+            </header>
+
+            <div class="flex-1 overflow-y-auto pb-8 hide-scrollbar">
+                <div class="px-6 mb-4">
+                    <div class="rounded-3xl overflow-hidden h-64 mb-3">
+                        <img id="detail-main-image" src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Main Property View" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex gap-3 overflow-x-auto hide-scrollbar">
+                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="w-16 h-16 rounded-xl object-cover border-2 border-brand cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1600607687920-4e2a09be1587?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="w-16 h-16 rounded-xl object-cover cursor-pointer opacity-70 hover:opacity-100 transition">
+                        <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="w-16 h-16 rounded-xl object-cover cursor-pointer opacity-70 hover:opacity-100 transition">
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="w-16 h-16 rounded-xl object-cover cursor-pointer opacity-70 hover:opacity-100 transition">
+                        <div class="w-16 h-16 rounded-xl bg-black/70 flex items-center justify-center text-white text-xs font-semibold relative overflow-hidden cursor-pointer shrink-0">
+                            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">
+                            <span class="relative z-10">+5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-6 mb-6">
+                    <h2 id="detail-price" class="text-3xl font-bold text-brand mb-1">₹9,679</h2>
+                    <div id="detail-location" class="flex items-center text-gray-500 text-sm mb-4">
+                        <i class="ph ph-map-pin mr-1"></i>
+                        Ratnagiri, Maharastra
+                    </div>
+
+                    <div id="detail-specs" class="flex items-center gap-4 text-sm text-gray-600 font-medium mb-6">
+                        <div class="flex items-center gap-1.5 border border-gray-100 shadow-sm px-3 py-1.5 rounded-lg">
+                            <i class="ph ph-bed text-gray-400"></i> 3 Bd
+                        </div>
+                        <div class="flex items-center gap-1.5 border border-gray-100 shadow-sm px-3 py-1.5 rounded-lg">
+                            <i class="ph ph-bathtub text-gray-400"></i> 2 Ba
+                        </div>
+                        <div class="flex items-center gap-1.5 border border-gray-100 shadow-sm px-3 py-1.5 rounded-lg">
+                            <i class="ph ph-squares-four text-gray-400"></i> 2660 Sqft
+                        </div>
+                    </div>
+
+                    <div class="w-full">
+                        <button class="balloon-btn schedule-btn-balloon">
+                            <span class="relative z-10">Schedule a Tour</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabs & Panels -->
+                <div class="px-6">
+                    <div class="flex justify-between border-b border-gray-100 mb-6 relative" id="detail-tabs">
+                        <button class="detail-tab active" data-tab="overview" onclick="switchDetailTab(this)">Overview</button>
+                        <button class="detail-tab" data-tab="amenities" onclick="switchDetailTab(this)">Amenities</button>
+                        <button class="detail-tab" data-tab="location" onclick="switchDetailTab(this)">Location</button>
+                        <button class="detail-tab" data-tab="policies" onclick="switchDetailTab(this)">Policies</button>
+                    </div>
+
+                    <!-- Overview Panel -->
+                    <div class="detail-panel active" id="panel-overview">
+                        <h3 class="font-bold text-lg mb-3">Property Description</h3>
+                        <div class="text-gray-500 text-sm leading-relaxed space-y-4">
+                            <p id="detail-desc1">This stunning modern villa in Ratnagiri offers the perfect blend of luxury and comfort. Featuring an open floor plan, high ceilings, and abundant natural light, this home is ideal for entertaining and family living.</p>
+                            <p>The recently updated kitchen boasts stainless steel appliances, quartz countertops, and a large island. Step outside to a private backyard oasis complete with a sparkling pool.</p>
+                        </div>
+                    </div>
+
+                    <!-- Amenities Panel -->
+                    <div class="detail-panel" id="panel-amenities">
+                        <h3 class="font-bold text-lg mb-3">Amenities</h3>
+                        <div class="grid grid-cols-2 gap-3 text-sm text-gray-600">
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-2.5 rounded-xl">
+                                <i class="ph ph-wifi-high text-brand text-lg"></i> High-Speed Wi-Fi
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-2.5 rounded-xl">
+                                <i class="ph ph-swimming-pool text-brand text-lg"></i> Private Pool
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-2.5 rounded-xl">
+                                <i class="ph ph-car text-brand text-lg"></i> Free Parking
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-2.5 rounded-xl">
+                                <i class="ph ph-snowflake text-brand text-lg"></i> Air Conditioning
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-2.5 rounded-xl">
+                                <i class="ph ph-cooking-pot text-brand text-lg"></i> Modern Kitchen
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-2.5 rounded-xl">
+                                <i class="ph ph-television text-brand text-lg"></i> Smart TV
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-2.5 rounded-xl">
+                                <i class="ph ph-washing-machine text-brand text-lg"></i> Washing Machine
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-2.5 rounded-xl">
+                                <i class="ph ph-shield-check text-brand text-lg"></i> 24/7 Security
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-2.5 rounded-xl">
+                                <i class="ph ph-plant text-brand text-lg"></i> Garden Area
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-2.5 rounded-xl">
+                                <i class="ph ph-barbell text-brand text-lg"></i> Gym Access
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Panel -->
+                    <div class="detail-panel" id="panel-location">
+                        <h3 class="font-bold text-lg mb-3">Location</h3>
+                        <div class="rounded-2xl overflow-hidden h-40 mb-4 border border-gray-100">
+                            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Map" class="w-full h-full object-cover">
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start gap-3">
+                                <i class="ph ph-map-pin text-brand text-lg mt-0.5"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Full Address</p>
+                                    <p class="text-gray-500">123 Coastal Road, Ratnagiri, Maharashtra 415612</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="ph ph-airplane-tilt text-brand text-lg mt-0.5"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Nearest Airport</p>
+                                    <p class="text-gray-500">Ratnagiri Airport — 12 km away</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="ph ph-train text-brand text-lg mt-0.5"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Nearest Railway Station</p>
+                                    <p class="text-gray-500">Ratnagiri Railway Station — 5 km away</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="ph ph-hospital text-brand text-lg mt-0.5"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Nearby Hospital</p>
+                                    <p class="text-gray-500">District Hospital — 3 km away</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="ph ph-storefront text-brand text-lg mt-0.5"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Shopping</p>
+                                    <p class="text-gray-500">City Center Mall — 2 km away</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Policies Panel -->
+                    <div class="detail-panel" id="panel-policies">
+                        <h3 class="font-bold text-lg mb-3">Policies</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="bg-gray-50 rounded-xl p-4">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="ph ph-clock text-brand text-lg"></i>
+                                    <p class="font-semibold text-gray-800">Check-in / Check-out</p>
+                                </div>
+                                <p class="text-gray-500">Check-in: 2:00 PM • Check-out: 11:00 AM</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-4">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="ph ph-prohibit text-brand text-lg"></i>
+                                    <p class="font-semibold text-gray-800">No Smoking</p>
+                                </div>
+                                <p class="text-gray-500">Smoking is strictly prohibited inside the property.</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-4">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="ph ph-paw-print text-brand text-lg"></i>
+                                    <p class="font-semibold text-gray-800">Pets</p>
+                                </div>
+                                <p class="text-gray-500">Pets are allowed on request with prior approval.</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-4">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="ph ph-credit-card text-brand text-lg"></i>
+                                    <p class="font-semibold text-gray-800">Payment & Cancellation</p>
+                                </div>
+                                <p class="text-gray-500">100% refund if cancelled 48 hours before check-in. 50% refund within 24 hours. No refund on same-day cancellation.</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-4">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="ph ph-identification-card text-brand text-lg"></i>
+                                    <p class="font-semibold text-gray-800">ID Requirement</p>
+                                </div>
+                                <p class="text-gray-500">Valid government-issued photo ID is mandatory for all guests.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================
+         PROPERTY DATA — 20 TOTAL PROPERTIES
+         ============================================ -->
+    <script>
+        const properties = [
+            /* ============ RATNAGIRI — VILLAS (1-9) ============ */
+            { id: 1, name: 'Pearl Villa', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Rent', category: 'Bunglow', price: '₹9,679', priceNote: '/ day', beds: 3, baths: 2, sqft: 2660, image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: true },
+            { id: 2, name: 'Ganesh Villa', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Buy', category: 'Bunglow', price: '₹1.2 Cr', priceNote: '', beds: 4, baths: 3, sqft: 3540, image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: true },
+            { id: 3, name: 'Gajraj Villa', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Rent', category: 'Bunglow', price: '₹6,500', priceNote: '/ day', beds: 3, baths: 2, sqft: 2400, image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 4, name: 'Deva Villa', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Buy', category: 'Bunglow', price: '₹89 Lakh', priceNote: '', beds: 3, baths: 3, sqft: 2800, image: 'https://images.unsplash.com/photo-1600607687920-4e2a09be1587?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 5, name: 'Meadows Villa', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Rent', category: 'Bunglow', price: '₹8,200', priceNote: '/ day', beds: 4, baths: 3, sqft: 3100, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 6, name: 'Ashmi Villa', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Buy', category: 'Bunglow', price: '₹1.5 Cr', priceNote: '', beds: 5, baths: 4, sqft: 4200, image: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 7, name: 'Shraddha Villa', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Rent', category: 'Bunglow', price: '₹5,500', priceNote: '/ day', beds: 2, baths: 2, sqft: 1800, image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 8, name: 'Bhumi Villa', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Buy', category: 'Bunglow', price: '₹1.05 Cr', priceNote: '', beds: 4, baths: 3, sqft: 3200, image: 'https://images.unsplash.com/photo-1600607687644-c7171b42498f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 9, name: 'Pearl Villa', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Buy', category: 'Bunglow', price: '₹1.35 Cr', priceNote: '', beds: 4, baths: 4, sqft: 3800, image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+
+            /* ============ RATNAGIRI — APARTMENTS (10-12) ============ */
+            { id: 10, name: 'Sea Breeze Apartment', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Rent', category: 'Apartment', price: '₹3,500', priceNote: 'per day', beds: 2, baths: 2, sqft: 1100, image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 11, name: 'Sunset Heights Apartment', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Buy', category: 'Apartment', price: '₹65 Lakh', priceNote: '', beds: 3, baths: 2, sqft: 1450, image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 12, name: 'Ocean Pearl Apartment', city: 'Ratnagiri', location: 'Ratnagiri, Maharastra', type: 'Rent', category: 'Apartment', price: '₹4,200', priceNote: 'per day', beds: 2, baths: 1, sqft: 950, image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+
+            /* ============ CHIPLUN — VILLAS (13-19) ============ */
+            { id: 13, name: 'Bhumi Villa', city: 'Chiplun', location: 'Chiplun, Maharastra', type: 'Rent', category: 'Bunglow', price: '₹7,200', priceNote: '/ day', beds: 3, baths: 2, sqft: 2400, image: 'https://images.unsplash.com/photo-1600607687920-4e2a09be1587?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: true },
+            { id: 14, name: 'Ganesh Villa', city: 'Chiplun', location: 'Chiplun, Maharastra', type: 'Buy', category: 'Bunglow', price: '₹1.5 Cr', priceNote: '', beds: 5, baths: 4, sqft: 4200, image: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 15, name: 'Gajraj Villa', city: 'Chiplun', location: 'Chiplun, Maharastra', type: 'Rent', category: 'Bunglow', price: '₹4,800', priceNote: '/ day', beds: 2, baths: 1, sqft: 950, image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 16, name: 'Deva Villa', city: 'Chiplun', location: 'Chiplun, Maharastra', type: 'Buy', category: 'Bunglow', price: '₹75 Lakh', priceNote: '', beds: 4, baths: 3, sqft: 3100, image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 17, name: 'Meadows Villa', city: 'Chiplun', location: 'Chiplun, Maharastra', type: 'Rent', category: 'Bunglow', price: '₹6,900', priceNote: '/ day', beds: 3, baths: 2, sqft: 2400, image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 18, name: 'Ashmi Villa', city: 'Chiplun', location: 'Chiplun, Maharastra', type: 'Buy', category: 'Bunglow', price: '₹1.1 Cr', priceNote: '', beds: 4, baths: 3, sqft: 3400, image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+            { id: 19, name: 'Shraddha Villa', city: 'Chiplun', location: 'Chiplun, Maharastra', type: 'Rent', category: 'Bunglow', price: '₹5,200', priceNote: '/ day', beds: 2, baths: 2, sqft: 1600, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false },
+
+            /* ============ CHIPLUN — APARTMENTS (20) ============ */
+            { id: 20, name: 'Riverside Apartment', city: 'Chiplun', location: 'Chiplun, Maharastra', type: 'Rent', category: 'Apartment', price: '₹2,800', priceNote: 'per day', beds: 2, baths: 1, sqft: 900, image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', featured: false }
+        ];
+
+        /* ============================================
+           STATE
+           ============================================ */
+        let currentFilter = 'All';
+        let currentQuery = '';
+
+        /* ============================================
+           HELPERS
+           ============================================ */
+        function formatPrice(p) {
+            return p.priceNote ? `${p.price} <span class="text-xs font-medium text-gray-400 ml-1">${p.priceNote}</span>` : p.price;
+        }
+
+        function buildCard(p) {
+            const badgeText = p.type === 'Rent' ? 'For Rent' : 'For Sale';
+            const badgeHtml = `<div class="badge-glass absolute top-3 left-3 text-xs font-semibold px-3 py-1.5 rounded-full">${badgeText}</div>`;
+
+            return `
+                <div class="bg-white rounded-3xl p-3 shadow-soft border border-gray-100 cursor-pointer transform transition hover:-translate-y-1" onclick="openDetails(${p.id})">
+                    <div class="relative rounded-2xl overflow-hidden h-48 mb-4">
+                        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                        ${badgeHtml}
+                        <button class="absolute top-3 right-3 w-8 h-8 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/60 transition">
+                            <i class="ph ph-bookmark-simple"></i>
+                        </button>
+                    </div>
+                    <div class="px-1">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-bold text-lg text-gray-900">${p.name}</h3>
+                            <span class="font-bold text-brand text-lg">${formatPrice(p)}</span>
+                        </div>
+                        <div class="flex items-center text-gray-500 text-sm mb-4">
+                            <i class="ph ph-map-pin mr-1"></i>
+                            ${p.location}
+                        </div>
+                        <div class="flex items-center gap-4 text-sm text-gray-600 font-medium">
+                            <div class="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-lg">
+                                <i class="ph ph-bed text-gray-400"></i> ${p.beds} Bd
+                            </div>
+                            <div class="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-lg">
+                                <i class="ph ph-bathtub text-gray-400"></i> ${p.baths} Ba
+                            </div>
+                            <div class="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-lg">
+                                <i class="ph ph-squares-four text-gray-400"></i> ${p.sqft} Sqft
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ============================================
+           FILTER + SEARCH
+           ============================================ */
+        function applyFilters() {
+            const q = currentQuery.trim().toLowerCase();
+            let results = properties.slice();
+
+            if (currentFilter === 'Buy') results = results.filter(p => p.type === 'Buy');
+            else if (currentFilter === 'Rent') results = results.filter(p => p.type === 'Rent');
+            else if (currentFilter === 'Bunglow') results = results.filter(p => p.category === 'Bunglow');
+            else if (currentFilter === 'Apartment') results = results.filter(p => p.category === 'Apartment');
+
+            if (q !== '') {
+                results = results.filter(p =>
+                    p.city.toLowerCase().includes(q) ||
+                    p.name.toLowerCase().includes(q) ||
+                    p.location.toLowerCase().includes(q)
+                );
+            }
+            return results;
+        }
+
+        function renderHomeList() {
+            const list = document.getElementById('property-list');
+            const empty = document.getElementById('empty-state');
+            const title = document.getElementById('list-title');
+            const emptyMsg = document.getElementById('empty-message');
+
+            // ✅ CHANGED: Default view now shows ALL properties (not just featured)
+            let results = applyFilters();
+
+            if (currentFilter === 'All' && currentQuery.trim() === '') {
+                title.textContent = 'All Properties';        // ← Title when nothing is filtered
+            } else {
+                const parts = [];
+                if (currentQuery.trim()) parts.push(`"${currentQuery.trim()}"`);
+                if (currentFilter !== 'All') parts.push(currentFilter);
+                title.textContent = `Results for ${parts.join(' • ')}`;
+            }
+
+            if (results.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+                emptyMsg.textContent = (currentQuery.trim() || currentFilter !== 'All')
+                    ? 'Try a different search or filter'
+                    : 'Try searching for "Ratnagiri" or "Chiplun"';
+            } else {
+                empty.classList.add('hidden');
+                list.innerHTML = results.map(buildCard).join('');
+            }
+        }
+
+        /* ============================================
+           DETAILS
+           ============================================ */
+        function openDetails(id) {
+            const p = properties.find(x => x.id === id);
+            if (!p) return;
+
+            document.getElementById('detail-main-image').src = p.image;
+            document.getElementById('detail-price').textContent = p.price + (p.priceNote ? ' ' + p.priceNote : '');
+            document.getElementById('detail-location').innerHTML = `<i class="ph ph-map-pin mr-1"></i> ${p.location}`;
+            document.getElementById('detail-specs').innerHTML = `
+                <div class="flex items-center gap-1.5 border border-gray-100 shadow-sm px-3 py-1.5 rounded-lg">
+                    <i class="ph ph-bed text-gray-400"></i> ${p.beds} Bd
+                </div>
+                <div class="flex items-center gap-1.5 border border-gray-100 shadow-sm px-3 py-1.5 rounded-lg">
+                    <i class="ph ph-bathtub text-gray-400"></i> ${p.baths} Ba
+                </div>
+                <div class="flex items-center gap-1.5 border border-gray-100 shadow-sm px-3 py-1.5 rounded-lg">
+                    <i class="ph ph-squares-four text-gray-400"></i> ${p.sqft} Sqft
+                </div>
+            `;
+            document.getElementById('detail-desc1').textContent =
+                `This stunning modern ${p.name} in ${p.city} offers the perfect blend of luxury and comfort. Featuring an open floor plan, high ceilings, and abundant natural light, this home is ideal for entertaining and family living.`;
+
+            switchDetailTab(document.querySelector('#detail-tabs .detail-tab[data-tab="overview"]'));
+
+            navigate('details-screen');
+        }
+
+        function switchDetailTab(tabBtn) {
+            const tabs = document.querySelectorAll('#detail-tabs .detail-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            tabBtn.classList.add('active');
+
+            const panels = document.querySelectorAll('.detail-panel');
+            panels.forEach(p => p.classList.remove('active'));
+
+            const target = document.getElementById(`panel-${tabBtn.dataset.tab}`);
+            if (target) target.classList.add('active');
+        }
+
+        /* ============================================
+           SEARCH INPUT WIRING
+           ============================================ */
+        document.addEventListener('DOMContentLoaded', () => {
+            const homeInput = document.getElementById('home-search-input');
+            const homeClear = document.getElementById('home-search-clear');
+
+            homeInput.addEventListener('input', (e) => {
+                currentQuery = e.target.value;
+                homeClear.classList.toggle('hidden', currentQuery.length > 0 ? false : true);
+                renderHomeList();
+            });
+
+            homeClear.addEventListener('click', () => {
+                homeInput.value = '';
+                currentQuery = '';
+                homeClear.classList.add('hidden');
+                renderHomeList();
+                homeInput.focus();
+            });
+
+            renderHomeList();
+        });
+
+        /* ============================================
+           NAV + PILLS
+           ============================================ */
+        function navigate(screenId) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => screen.classList.remove('active'));
+
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) targetScreen.classList.add('active');
+
+            if (targetScreen) {
+                const scrollableArea = targetScreen.querySelector('.overflow-y-auto');
+                if (scrollableArea) scrollableArea.scrollTop = 0;
+            }
+        }
+
+        function activateFilter(clickedBtn) {
+            const pills = document.querySelectorAll('#filter-pills button');
+            pills.forEach(pill => {
+                pill.classList.remove('balloon-btn', 'pill-balloon');
+                pill.classList.add('pill-inactive');
+            });
+            clickedBtn.classList.remove('pill-inactive');
+            clickedBtn.classList.add('balloon-btn', 'pill-balloon');
+
+            currentFilter = clickedBtn.dataset.filter;
+            renderHomeList();
+        }
+
+        function activateTab(clickedBtn) {
+            const navItems = document.querySelectorAll('#bottom-nav .nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            clickedBtn.classList.add('active');
+        }
+    </script>
+</body>
+</html>
